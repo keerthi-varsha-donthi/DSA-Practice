@@ -27,61 +27,37 @@ Link:https://leetcode.com/problems/palindrome-number/description/?envType=study-
 #include <bits/stdc++.h>
 using namespace std;
 
-// ---------------- Brute Force ----------------
-
-/*
-Intuition:
-
-Approach:
-
-Time Complexity:
-
-Space Complexity:
-*/
-
-class BruteForceSolution {
-public:
-
-};
-
-
-
-
-// ---------------- Better Approach ----------------
-
-/*
-Intuition:
-
-Approach:
-
-Time Complexity:
-
-Space Complexity:
-*/
-
-class BetterSolution {
-public:
-
-};
-
-
-
 
 // ---------------- Optimal Approach ----------------
 
 /*
-Intuition:
+Intuition: A palindrome number remains the same when reversed. So we reverse the given number mathematically and compare it with the original number.
 
-Approach:
+Approach: 
+- Negative numbers are never palindrome
+- Store original number in another variable 
+- Reverse the number by extracting digits and building the reversed number
+- Compare reversed number with original number
 
-Time Complexity:
+Time Complexity: O(log10(x)) where x is the input number
 
-Space Complexity:
+Space Complexity: O(1)
 */
 
 class OptimalSolution {
 public:
+    bool isPalindrome(int x){
+        if(x<0) return false;
 
+        int num = x;
+        long long rev = 0;
+
+        while(num){
+            rev = rev*10 + num%10;
+            num /= 10;
+        }
+        return rev == x;
+    }
 };
 
 // ========================================================
@@ -89,7 +65,14 @@ public:
 // ========================================================
 
 int main() {
+    int x;
+    cin>>x;
 
+    OptimalSolution optimal;
+    bool result = optimal.isPalindrome(x);
+
+    if(result) cout<<"true"<<endl;
+    else cout<<"false"<<endl;
 
     return 0;
 }
