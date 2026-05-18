@@ -33,18 +33,27 @@ using namespace std;
 // ---------------- Brute Force ----------------
 
 /*
-Intuition:
+Intuition: To calculate x raised to power n, we can multiply x by itself exactly n times.
 
-Approach:
+Approach: We can initialize a variable ans to 1 and then multiply it by x in a loop that runs n times. If n is negative, we can take the reciprocal of x and make n positive before the loop.
 
-Time Complexity:
+Time Complexity: O(n) where n is the power to which x is raised.
 
-Space Complexity:
+Space Complexity: O(1).
 */
 
 class BruteForceSolution {
 public:
+    double myPow(double x, int n){
 
+        double ans = 1;
+        long long power = abs((long long)n);
+        for(int i=0; i<power; i++){
+            ans *= x;
+        }
+        if(n < 0) ans = (double)(1.0) / ans;
+        return ans;
+    }
 };
 
 
@@ -53,18 +62,36 @@ public:
 // ---------------- Better Approach ----------------
 
 /*
-Intuition:
+Intuition: Negative powers can be handled beforehand by converting: x^(-n) = 1/(x^n). This way we can work with positive powers only.
 
-Approach:
+Approach: 
+- Store n in long long to handle INT_MIN safely
+- If n is negative:
+    - Take the reciprocal of x
+    - Make n positive
+- Multiply x repeatedly power times
+- Return the result
 
-Time Complexity:
+Time Complexity: O(n) where n is the power to which x is raised.
 
-Space Complexity:
+Space Complexity: O(1).
 */
 
 class BetterSolution {
 public:
+    double myPow(double x, int n){
+        double ans = 1;
+        long long power = n;
 
+        if(power < 0){
+            x = 1/x;
+            power = -power;
+        }
+        for(int i=0; i<power; i++){
+            ans *= x;
+        }
+        return ans;
+    }
 };
 
 
@@ -73,18 +100,41 @@ public:
 // ---------------- Optimal Approach ----------------
 
 /*
-Intuition:
+Intuition: Instead of multiplying x repeatedly, we can reduce computations using Bianry Exponentiation.
+If power is even: x^n = (x*x)^(n/2)
+If power is odd: x^n = x * (x)^(n-1)
+This reduces the power by half in every step.
 
 Approach:
+- Convert negative power into positive
+- Use Binary Exponentiation:
+    - If power is odd, multiply ans by x
+    - Square x and halve the power
+- Continue until power becomes zero
 
-Time Complexity:
+Time Complexity: O(log n) where n is the power to which x is raised.
 
 Space Complexity:
 */
 
 class OptimalSolution {
 public:
+    double myPow(double x, int n){
+        long long power = n;
+        double ans = 1;
 
+        if(power<0){
+            x=1/x;
+            power = -power;
+        }
+
+        while(power){
+            if(power%2 == 1) ans = ans * x;
+            x = x*x;
+            power = power/2;
+        }
+        return ans;
+    }
 };
 
 // ========================================================
@@ -92,7 +142,18 @@ public:
 // ========================================================
 
 int main() {
+    double x;
+    int n;
 
+    cin>>x>>n;
+
+    BruteForceSolution bfs;
+    BetterSolution bes;
+    OptimalSolution ops;   
+    cout<<"Brute Force Solution: "<<bfs.myPow(x, n)<<endl;
+    cout<<"Better Solution: "<<bes.myPow(x, n)<<endl;
+    cout<<"Optimal Solution: "<<ops.myPow(x, n)<<endl;
+    
 
     return 0;
 }

@@ -23,61 +23,66 @@ Link: https://leetcode.com/problems/max-points-on-a-line/description/?envType=st
 #include <bits/stdc++.h>
 using namespace std;
 
-// ---------------- Brute Force ----------------
-
-/*
-Intuition:
-
-Approach:
-
-Time Complexity:
-
-Space Complexity:
-*/
-
-class BruteForceSolution {
-public:
-
-};
-
-
-
-
-// ---------------- Better Approach ----------------
-
-/*
-Intuition:
-
-Approach:
-
-Time Complexity:
-
-Space Complexity:
-*/
-
-class BetterSolution {
-public:
-
-};
-
-
-
 
 // ---------------- Optimal Approach ----------------
 
 /*
-Intuition:
+Intuition: If multiple points have the same slope with respect to a fixed anchor point, then all those points lie on the same straight line.
 
-Approach:
+Approach: 
+- Take each point as an anchor point
+- Compute slope with every other point
+- Store slope frequency in hashmap
+- Use reduced fraction (dx/gcd, dy/gcd) to avoid precision issues
+- Maximum frequency + anchor point gives answer
 
-Time Complexity:
+Time Complexity: O(n^2)
 
-Space Complexity:
+Space Complexity: O(n)
 */
 
 class OptimalSolution {
 public:
+    int maxPoints(vector<vector<int>>& points) {
+        int n = points.size();
 
+        if (n <= 2) return n;
+
+        int ans = 0;
+
+        for (int i = 0; i < n; i++) {
+
+            map<pair<int, int>, int> freq;
+            int maxi = 0;
+
+            for (int j = i + 1; j < n; j++) {
+
+                int dy = points[j][1] - points[i][1];
+                int dx = points[j][0] - points[i][0];
+                int gcd_val = __gcd(dx, dy);
+
+                dx /= gcd_val;
+                dy /= gcd_val;
+
+                // Normalize sign
+                if (dx < 0) {
+                    dx *= -1;
+                    dy *= -1;
+                }
+
+                // Vertical line
+                if (dx == 0) dy = 1;
+
+                // Horizontal line
+                if (dy == 0) dx = 1;
+
+                freq[{dx, dy}]++;
+                maxi = max(maxi, freq[{dx, dy}]);
+            }
+            ans = max(ans, maxi + 1);
+        }
+        return ans;
+    }
 };
 
 // ========================================================
@@ -85,7 +90,19 @@ public:
 // ========================================================
 
 int main() {
+    int n;
+    cout<<"Enter number of points: ";
+    cin>>n;
 
+    vector<vector<int>> points(n, vector<int>(2));
+    cout<<"Enter points (x y): "<<endl;
+    for (int i = 0; i < n; i++) {
+        cin>>points[i][0]>>points[i][1];
+    }
+
+    OptimalSolution solution;
+    int result = solution.maxPoints(points);
+    cout<<"Maximum number of points on a line: "<<result<<endl;
 
     return 0;
 }
