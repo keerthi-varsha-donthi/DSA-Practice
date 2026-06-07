@@ -69,62 +69,56 @@ void printLinkedList(ListNode* head) {
 
 
 
-
-// ---------------- Brute Force ----------------
-
-/*
-Intuition:
-
-Approach:
-
-Time Complexity:
-
-Space Complexity:
-*/
-
-class BruteForceSolution {
-public:
-
-};
-
-
-
-
-// ---------------- Better Approach ----------------
-
-/*
-Intuition:
-
-Approach:
-
-Time Complexity:
-
-Space Complexity:
-*/
-
-class BetterSolution {
-public:
-
-};
-
-
-
-
 // ---------------- Optimal Approach ----------------
 
 /*
-Intuition:
+Intuition: We need to rearrange the linked list such that all nodes with values less than x appear before nodes with values greater than or equal to x, while preserving the original relative order within each group.
+To achieve this, we create 2 seperate lists:
+1. A list containing nodes with values<x.
+2. A list containing nodes with values>=x.
+After traversing the original list, we connect the smaller list to the larger list and return the head of the combined list.
 
 Approach:
+1.Create 2 dummy nodes: smallDummy and largeDummy.
+2. Traverse the original list:
+    - If current node's value<x, append it to the small list.
+    - Otherwise, append it to the large list.
+3. Terminate the large list by setting largeList->next = nullptr.
+4. Connect the end of the small list to the start of the large list.
+5. Return smallDummy.next as the new head.
 
-Time Complexity:
+Time Complexity: O(n)
 
-Space Complexity:
+Space Complexity: O(1)
 */
 
 class OptimalSolution {
 public:
+    ListNode* partition(ListNode* head, int x) {
+        if(!head || !head->next) return head;
 
+        ListNode smallDummy(0);
+        ListNode largeDummy(0);
+
+        ListNode* smallList = &smallDummy;
+        ListNode* largeList = &largeDummy;
+
+        ListNode* temp = head;
+        while(temp){
+            if(temp->val<x){
+                smallList->next = temp;
+                smallList = smallList->next;
+            }else{
+                largeList->next = temp;
+                largeList = largeList->next;
+            }
+            temp = temp->next;
+        }
+        largeList->next = nullptr;
+        smallList->next = largeDummy.next;
+
+        return smallDummy.next;
+    }
 };
 
 
@@ -134,11 +128,18 @@ public:
 
 int main() {
 
-    vector<int> arr = {1, 2, 3, 4, 5};
+    vector<int> arr = {1, 4, 3, 2, 5, 2};
 
     ListNode* head = createLinkedList(arr);
 
     cout << "Original Linked List: ";
+    printLinkedList(head);
+
+    OptimalSolution obj;
+
+    head = obj.partition(head, 3);
+
+    cout << "Partitioned Linked List: ";
     printLinkedList(head);
 
     return 0;

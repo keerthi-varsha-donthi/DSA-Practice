@@ -38,14 +38,16 @@ using namespace std;
 //                     ListNode Definition
 // ========================================================
 
-class ListNode {
+class Node {
 public:
     int val;
-    ListNode* next;
-
-    ListNode(int data) {
-        val = data;
-        next = nullptr;
+    Node* next;
+    Node* random;
+    
+    Node(int _val) {
+        val = _val;
+        next = NULL;
+        random = NULL;
     }
 };
 
@@ -54,14 +56,14 @@ public:
 // ========================================================
 
 // Create Linked List from vector
-ListNode* createLinkedList(vector<int>& arr) {
+Node* createLinkedList(vector<int>& arr) {
     if(arr.empty()) return nullptr;
 
-    ListNode* head = new ListNode(arr[0]);
-    ListNode* temp = head;
+    Node* head = new Node(arr[0]);
+    Node* temp = head;
 
     for(int i = 1; i < arr.size(); i++) {
-        temp->next = new ListNode(arr[i]);
+        temp->next = new Node(arr[i]);
         temp = temp->next;
     }
 
@@ -69,7 +71,7 @@ ListNode* createLinkedList(vector<int>& arr) {
 }
 
 // Print Linked List
-void printLinkedList(ListNode* head) {
+void printLinkedList(Node* head) {
     while(head) {
         cout << head->val;
         if(head->next) cout << " -> ";
@@ -80,42 +82,46 @@ void printLinkedList(ListNode* head) {
 
 
 
-
-// ---------------- Brute Force ----------------
-
-/*
-Intuition:
-
-Approach:
-
-Time Complexity:
-
-Space Complexity:
-*/
-
-class BruteForceSolution {
-public:
-
-};
-
-
-
-
 // ---------------- Better Approach ----------------
 
 /*
-Intuition:
+Intuition: Use a hashmap to maintain a mapping between each original node and its corresponding copied node. Once all copied nodes are created, the map allows direct access to assign next and random pointers.
 
 Approach:
+1. Traverse the original list and create a copy of every node.
+2. Store the mapping: original node -> copied node
+3. Traverse the list again.
+4. Use map to connect:
+    copy->next = copy of original->next
+    copy->random = copy of original->random
+5. Return the copy corresponding to the original head.
 
-Time Complexity:
+Time Complexity: O(N)
 
-Space Complexity:
+Space Complexity: O(n)
 */
 
 class BetterSolution {
 public:
+    Node* copyRandomList(Node* head) {
+        if(!head) return head;
 
+        unordered_map<Node*, Node*> mp;
+        Node* temp = head;
+        while(temp){
+            mp[temp] = new Node(temp->val);
+            temp = temp->next;
+        }
+
+        temp = head;
+        while(temp){
+            mp[temp]->next = mp[temp->next];
+            mp[temp]->random = mp[temp->random];
+            temp = temp->next;
+        }
+        
+        return mp[head];
+    }
 };
 
 
@@ -124,18 +130,56 @@ public:
 // ---------------- Optimal Approach ----------------
 
 /*
-Intuition:
+Intuition: Instead of storing the mapping in a hashmap, insert each copied node immediately after its original node. This makes the copy of any node accessible through original->next. Random pointers can then be assigned without extra space, and finally the original and copied lists are seperated.
 
 Approach:
+1. Insert a copied node after every original node.
+2. Assign random pointers: copy->random = original->random->next.
+3. Separate the interleaved list into: original list ans Copied list
+4. Return the head of the copied list.
 
-Time Complexity:
+Time Complexity: O(n)
 
-Space Complexity:
+Space Complexity: O(1)
 */
 
 class OptimalSolution {
 public:
+    Node* copyRandomList(Node* head) {
+        if(!head) return head;
 
+        Node* curr = head;
+        while(curr){
+            Node* copy = new Node(curr->val);
+
+            copy->next = curr->next;
+            curr->next = copy;
+
+            curr = copy->next;
+        }
+
+        curr = head;
+        while(curr){
+            if(curr->random) curr->next->random = curr->random->next;
+            curr = curr->next->next;
+        }
+
+        Node* dummy = new Node(-1);
+        Node* tail = dummy;
+        curr = head;
+
+        while(curr){
+            Node* copy = curr->next;
+            tail->next = copy;
+
+            curr->next = curr->next->next;
+            curr = curr->next;
+
+            tail = tail->next;
+        }
+
+        return dummy->next;
+    }
 };
 
 
@@ -145,12 +189,44 @@ public:
 
 int main() {
 
-    vector<int> arr = {1, 2, 3, 4, 5};
+    Node* n1 = new Node(7);
+    Node* n2 = new Node(13);
+    Node* n3 = new Node(11);
+    Node* n4 = new Node(10);
+    Node* n5 = new Node(1);
 
-    ListNode* head = createLinkedList(arr);
+    n1->next = n2;
+    n2->next = n3;
+    n3->next = n4;
+    n4->next = n5;
 
-    cout << "Original Linked List: ";
-    printLinkedList(head);
+    n1->random = nullptr;
+    n2->random = n1;
+    n3->random = n5;
+    n4->random = n3;
+    n5->random = n1;
+
+    OptimalSolution obj;
+
+    Node* copiedHead = obj.copyRandomList(n1);
+
+    cout << "Copied List:\n";
+
+    Node* temp = copiedHead;
+
+    while(temp) {
+
+        cout << "Value: " << temp->val << ", Random: ";
+
+        if(temp->random)
+            cout << temp->random->val;
+        else
+            cout << "NULL";
+
+        cout << endl;
+
+        temp = temp->next;
+    }
 
     return 0;
 }

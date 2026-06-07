@@ -67,62 +67,50 @@ void printLinkedList(ListNode* head) {
 
 
 
-
-// ---------------- Brute Force ----------------
-
-/*
-Intuition:
-
-Approach:
-
-Time Complexity:
-
-Space Complexity:
-*/
-
-class BruteForceSolution {
-public:
-
-};
-
-
-
-
-// ---------------- Better Approach ----------------
-
-/*
-Intuition:
-
-Approach:
-
-Time Complexity:
-
-Space Complexity:
-*/
-
-class BetterSolution {
-public:
-
-};
-
-
-
-
 // ---------------- Optimal Approach ----------------
 
 /*
-Intuition:
+Intuition: Rotating the list to the right by k positions means that the last k nodes become the new prefix of the list. Instead of moving nodes one by one, first connect the tail to the head to form a circular linked list, then break the circle at the correct position to obtain the rotated list.
 
 Approach:
+1. Find the length of the linked list and the last node. 
+2. Compute the effective rotations: k = k%length
+3. If k==0, return the original list.
+4. Connect the tail to the head to form a circular linked list.
+5. Move to the new tail, which is located at: length-k-1 steps from the head.
+6. The node after the new tail becomes the new head.
+7. Break the circular link and return the new head.
 
-Time Complexity:
+Time Complexity: O(n)
 
-Space Complexity:
+Space Complexity: O(1)
 */
 
 class OptimalSolution {
 public:
+    ListNode* rotateRight(ListNode* head, int k) {
+        if(head==nullptr || head->next==nullptr || k==0) return head;
+        
+        int cnt = 1;
+        ListNode* tail = head;
+        while(tail->next){
+            cnt++;
+            tail=tail->next;
+        }
 
+        k = k%cnt;
+        if(k==0) return head; 
+
+        tail->next = head;
+        ListNode* newTail = head;
+        for(int i=0; i<cnt-k-1; i++){
+            newTail = newTail->next;
+        }
+        ListNode* newHead = newTail->next;
+        newTail->next = nullptr;
+
+        return newHead;
+    }
 };
 
 
@@ -138,6 +126,13 @@ int main() {
 
     cout << "Original Linked List: ";
     printLinkedList(head);
+
+    OptimalSolution obj;
+
+    ListNode* rotatedHead = obj.rotateRight(head, 2);
+
+    cout << "Rotated Linked List: ";
+    printLinkedList(rotatedHead);
 
     return 0;
 }
