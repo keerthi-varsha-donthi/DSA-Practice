@@ -129,7 +129,7 @@ Intuition: Instead of storing nodes, reverse the sublist in-place by repeatedly 
 
 Approach:
 1. Create a dummy node before head.
-2. Move prev to the node jsut before position left.
+2. Move prev to the node just before position left.
 3. Let curr be the first node of the sublist.
 4. Repeatedly:
     - Take the node after curr.

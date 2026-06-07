@@ -70,63 +70,68 @@ void printLinkedList(ListNode* head) {
 }
 
 
-
-
-// ---------------- Brute Force ----------------
-
-/*
-Intuition:
-
-Approach:
-
-Time Complexity:
-
-Space Complexity:
-*/
-
-class BruteForceSolution {
-public:
-
-};
-
-
-
-
-// ---------------- Better Approach ----------------
-
-/*
-Intuition:
-
-Approach:
-
-Time Complexity:
-
-Space Complexity:
-*/
-
-class BetterSolution {
-public:
-
-};
-
-
-
-
 // ---------------- Optimal Approach ----------------
 
 /*
-Intuition:
+Intuition: Instead of using extra space to store nodes, reverse each complete
+group of k nodes directly by changing the links between nodes.
+After reversing a group, reconnect it to the previous and next 
+parts of the list. Any remaining nodes fewer than k are left unchanged.
 
 Approach:
+1. Create a dummy node before the head.
+2. Use groupPrev to track the node before the current group.
+3. Find the kth node from groupPrev.
+4. If fewer than k nodes reamin, stop.
+5. Store the node after the kth node as groupNext.
+6. Reverse the current group using the standard linked-list reversal technique.
+7. Connect the reversed group back to the list.
+8. Move groupPrev to the tail of the newly reversed group.
+9. Repeat until all complete groups are processed.
 
-Time Complexity:
+Time Complexity: O(n)
 
-Space Complexity:
+Space Complexity: O(1)
 */
 
 class OptimalSolution {
 public:
+    ListNode* getKthNode(ListNode* curr, int k){
+        while(curr && k--) curr = curr->next;
+        return curr;
+    }
 
+    ListNode* reverseKGroup(ListNode* head, int k) {
+        if(!head || k==1) return head;
+
+        ListNode dummy(0);
+        dummy.next = head;
+
+        ListNode* groupPrev = &dummy;
+
+        while(true){
+            ListNode* kth = getKthNode(groupPrev, k);
+
+            if(!kth) break;
+
+            ListNode* groupNext = kth->next;
+
+            ListNode* prev = groupNext;
+            ListNode* curr = groupPrev->next;
+
+            while(curr != groupNext){
+                ListNode* temp = curr->next;
+                curr->next = prev;
+                prev = curr;
+                curr = temp;
+            }
+
+            ListNode* temp = groupPrev->next;
+            groupPrev->next = kth;
+            groupPrev = temp;
+        }
+        return dummy.next;
+    }
 };
 
 
@@ -142,6 +147,16 @@ int main() {
 
     cout << "Original Linked List: ";
     printLinkedList(head);
+
+    OptimalSolution obj;
+
+    int k = 2;
+
+    ListNode* result = obj.reverseKGroup(head, k);
+
+    cout << "After Reversing in Groups of " << k << ": ";
+    printLinkedList(result);
+
 
     return 0;
 }

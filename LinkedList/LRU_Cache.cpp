@@ -44,104 +44,86 @@ using namespace std;
 //                     ListNode Definition
 // ========================================================
 
-class ListNode {
+class Node{
 public:
-    int val;
-    ListNode* next;
+    int key;
+    int value; 
+    Node* prev;
+    Node* next;
 
-    ListNode(int data) {
-        val = data;
+    Node(int k, int v){
+        key = k;
+        value = v;
+        prev = nullptr;
         next = nullptr;
     }
 };
 
-// ========================================================
-//                    Helper Functions
-// ========================================================
+class LRUCache {
+private:
+    int cap;
+    unordered_map<int, Node*> mp;
+    Node* head;
+    Node* tail;
 
-// Create Linked List from vector
-ListNode* createLinkedList(vector<int>& arr) {
-    if(arr.empty()) return nullptr;
+    void remove(Node* node){
+        Node* prevNode = node->prev;
+        Node* nextNode = node->next;
 
-    ListNode* head = new ListNode(arr[0]);
-    ListNode* temp = head;
-
-    for(int i = 1; i < arr.size(); i++) {
-        temp->next = new ListNode(arr[i]);
-        temp = temp->next;
+        prevNode->next = nextNode;
+        nextNode->prev = prevNode;
     }
 
-    return head;
-}
+    void insert(Node* node){
+       node->prev = tail->prev;
+       node->next = tail;
 
-// Print Linked List
-void printLinkedList(ListNode* head) {
-    while(head) {
-        cout << head->val;
-        if(head->next) cout << " -> ";
-        head = head->next;
+       tail->prev->next = node;
+       tail->prev = node;
     }
-    cout << endl;
-}
 
-
-
-
-// ---------------- Brute Force ----------------
-
-/*
-Intuition:
-
-Approach:
-
-Time Complexity:
-
-Space Complexity:
-*/
-
-class BruteForceSolution {
 public:
+    LRUCache(int capacity) {
+        cap = capacity;
 
-};
+        head = new Node(-1, -1);
+        tail = new Node(-1, -1);
 
+        head->next = tail;
+        tail->prev = head;
+    }
+    
+    int get(int key) {
+        if(mp.find(key)==mp.end()) return -1;
 
+        Node* node = mp[key];
+        remove(node);
+        insert(node);
 
+        return node->value; 
+    }
+    
+    void put(int key, int value) {
+        if(mp.find(key) != mp.end()){
+            Node* node = mp[key];
+            node->value = value;
 
-// ---------------- Better Approach ----------------
+            remove(node);
+            insert(node);
 
-/*
-Intuition:
+            return;
+        }
+        Node* node = new Node(key, value);
+        mp[key] = node;
+        insert(node);
 
-Approach:
-
-Time Complexity:
-
-Space Complexity:
-*/
-
-class BetterSolution {
-public:
-
-};
-
-
-
-
-// ---------------- Optimal Approach ----------------
-
-/*
-Intuition:
-
-Approach:
-
-Time Complexity:
-
-Space Complexity:
-*/
-
-class OptimalSolution {
-public:
-
+        if(mp.size()>cap){
+            Node* lru = head->next;
+            remove(lru);
+            mp.erase(lru->key);
+            delete lru;
+        }
+    }
 };
 
 
@@ -151,12 +133,23 @@ public:
 
 int main() {
 
-    vector<int> arr = {1, 2, 3, 4, 5};
+    LRUCache cache(2);
 
-    ListNode* head = createLinkedList(arr);
+    cache.put(1, 1);
+    cache.put(2, 2);
 
-    cout << "Original Linked List: ";
-    printLinkedList(head);
+    cout << cache.get(1) << endl; // 1
+
+    cache.put(3, 3);
+
+    cout << cache.get(2) << endl; // -1
+
+    cache.put(4, 4);
+
+    cout << cache.get(1) << endl; // -1
+    cout << cache.get(3) << endl; // 3
+    cout << cache.get(4) << endl; // 4
 
     return 0;
 }
+
